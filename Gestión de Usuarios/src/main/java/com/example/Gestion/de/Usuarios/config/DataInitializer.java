@@ -5,7 +5,6 @@ import com.example.Gestion.de.Usuarios.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -137,15 +136,18 @@ public class DataInitializer implements ApplicationRunner {
         Optional<Rol> opt = rolRepository.findByNombre(nombre);
         if (opt.isPresent()) {
             Rol existente = opt.get();
-            // Asegurar que la descripción y permisos estén actualizados (sin duplicar)
             existente.setDescripcion(descripcion);
-            existente.setPermisos(permisos);
+            // ✅ Convertir a lista mutable
+            existente.setPermisos(new ArrayList<>(permisos));
             return rolRepository.save(existente);
         }
         Rol r = new Rol();
         r.setNombre(nombre);
         r.setDescripcion(descripcion);
-        r.setPermisos(permisos);
+        // ✅ Lista mutable
+        r.setPermisos(new ArrayList<>(permisos));
+        // ✅ Inicializar usuarios como lista vacía mutable
+        r.setUsuarios(new ArrayList<>());
         return rolRepository.save(r);
     }
 
@@ -184,7 +186,8 @@ public class DataInitializer implements ApplicationRunner {
         u.setPassword(passwordEncoder.encode(passwordPlano));
         u.setTelefono(telefono);
         u.setDireccion(dir);
-        u.setRoles(roles);
+        // ✅ Lista mutable
+        u.setRoles(new ArrayList<>(roles));
         u.setActivo(true);
         u.setFechaCreacion(LocalDateTime.now());
         u.setFechaActualizacion(LocalDateTime.now());
