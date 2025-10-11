@@ -1,0 +1,7 @@
+package com.example.gestion.de.informes.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import com.example.gestion.de.informes.model.Informe;
+
+public interface InformeRepository extends JpaRepository<Informe, Long> {
+}
