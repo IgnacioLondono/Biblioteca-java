@@ -1,0 +1,29 @@
+package com.example.GestionDeInformes.application.controller;
+
+import com.example.GestionDeInformes.application.dto.PrestamosResumenDTO;
+import com.example.GestionDeInformes.application.dto.UsuarioResumenDTO;
+import com.example.GestionDeInformes.application.service.InformeService;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/informes")
+public class InformeController {
+
+    private final InformeService informeService;
+
+    public InformeController(InformeService informeService) {
+        this.informeService = informeService;
+    }
+
+    @GetMapping("/prestamos/resumen")
+    public PrestamosResumenDTO resumenPrestamos() {
+        return informeService.generarResumenPrestamos();
+    }
+
+    @GetMapping("/usuarios/resumen")
+    public List<UsuarioResumenDTO> resumenUsuarios() {
+        return informeService.generarResumenUsuarios();
+    }
+}

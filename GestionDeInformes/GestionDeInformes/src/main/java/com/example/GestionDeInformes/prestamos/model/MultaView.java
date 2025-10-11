@@ -39,6 +39,7 @@ public class MultaView {
         PENDIENTE, PAGADA, EXENTA
     }
 
+    // getters / setters (mantén exactamente como tenías)
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

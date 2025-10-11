@@ -1,0 +1,74 @@
+package com.example.GestionDeInformes.application.service;
+
+import com.example.GestionDeInformes.application.dto.PrestamosResumenDTO;
+import com.example.GestionDeInformes.application.dto.UsuarioResumenDTO;
+import com.example.GestionDeInformes.prestamos.model.MultaView.MultaEstado;
+import com.example.GestionDeInformes.prestamos.model.PrestamoView.PrestamoEstado;
+import com.example.GestionDeInformes.prestamos.repository.MultaInformeRepository;
+import com.example.GestionDeInformes.prestamos.repository.PrestamoInformeRepository;
+import com.example.GestionDeInformes.usuarios.repository.UsuarioInformeRepository;
+import com.example.GestionDeInformes.usuarios.model.UsuarioView;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class InformeService {
+
+    private final PrestamoInformeRepository prestamoRepo;
+    private final MultaInformeRepository multaRepo;
+    private final UsuarioInformeRepository usuarioRepo;
+
+    public InformeService(PrestamoInformeRepository prestamoRepo,
+                          MultaInformeRepository multaRepo,
+                          UsuarioInformeRepository usuarioRepo) {
+        this.prestamoRepo = prestamoRepo;
+        this.multaRepo = multaRepo;
+        this.usuarioRepo = usuarioRepo;
+    }
+
+    public PrestamosResumenDTO generarResumenPrestamos() {
+        PrestamosResumenDTO dto = new PrestamosResumenDTO();
+
+        long total = prestamoRepo.count();
+        long activos = prestamoRepo.countByEstado(PrestamoEstado.ACTIVO);
+        long atrasos = prestamoRepo.countByEstado(PrestamoEstado.ATRASO);
+        long devueltos = prestamoRepo.countByEstado(PrestamoEstado.DEVUELTO);
+        long cancelados = prestamoRepo.countByEstado(PrestamoEstado.CANCELADO);
+        long perdidos = prestamoRepo.countByEstado(PrestamoEstado.PERDIDO);
+
+        long multasPendientes = multaRepo.countByEstado(MultaEstado.PENDIENTE);
+        long multasPagadas = multaRepo.countByEstado(MultaEstado.PAGADA);
+
+        dto.setTotalPrestamos(total);
+        dto.setActivos(activos);
+        dto.setAtraso(atrasos);
+        dto.setDevueltos(devueltos);
+        dto.setCancelados(cancelados);
+        dto.setPerdidos(perdidos);
+        dto.setMultasPendientes(multasPendientes);
+        dto.setMultasPagadas(multasPagadas);
+
+        return dto;
+    }
+
+    public List<UsuarioResumenDTO> generarResumenUsuarios() {
+        List<UsuarioView> usuarios = usuarioRepo.findAll();
+        return usuarios.stream().map(u -> {
+            UsuarioResumenDTO dto = new UsuarioResumenDTO();
+            dto.setUsuarioId(u.getId());
+            dto.setNombreCompleto(u.getNombre() + " " + u.getApellido());
+            dto.setEmail(u.getEmail());
+            long totalPrestamos = prestamoRepo.countByUsuarioId(u.getId());
+            long prestamosActivos = prestamoRepo.countByUsuarioIdAndEstado(u.getId(), PrestamoEstado.ACTIVO);
+            long prestamosAtraso = prestamoRepo.countByUsuarioIdAndEstado(u.getId(), PrestamoEstado.ATRASO);
+            long multasPendientes = multaRepo.countByPrestamo_UsuarioIdAndEstado(u.getId(), MultaEstado.PENDIENTE);
+            dto.setTotalPrestamos(totalPrestamos);
+            dto.setPrestamosActivos(prestamosActivos);
+            dto.setPrestamosAtraso(prestamosAtraso);
+            dto.setMultasPendientes(multasPendientes);
+            return dto;
+        }).collect(Collectors.toList());
+    }
+}

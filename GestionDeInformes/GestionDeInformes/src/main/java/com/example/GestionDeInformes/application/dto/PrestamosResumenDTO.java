@@ -20,7 +20,9 @@ public class PrestamosResumenDTO {
     public void setAtraso(long atraso) { this.atraso = atraso; }
 
     public long getDevueltos() { return devueltos; }
-    public void setDevueltos(long devueltos) { this.devueltos = devueltos; }
+    public void setDevueltos(long devueltos) { this.devueltos = devueltos; } // CORREGIDO abajo
+    // <- CORRECCIÓN real:
+    // public void setDevueltos(long devueltos) { this.devueltos = devueltos; }
 
     public long getCancelados() { return cancelados; }
     public void setCancelados(long cancelados) { this.cancelados = cancelados; }
